@@ -1,0 +1,25 @@
+{
+  "name": "teamtracer",
+  "version": "1.0.0",
+  "description": "a Content Management System (CMS) employee tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sarahlophus/teamtracer.git"
+  },
+  "author": "Sarah Williams",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sarahlophus/teamtracer/issues"
+  },
+  "homepage": "https://github.com/Sarahlophus/teamtracer#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^16.0.0",
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3"
+  }
+}
