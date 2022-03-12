@@ -27,16 +27,20 @@ function init() {
         message: "What would you like to do?",
         choices: [
           {
-            name: "view all employees",
+            name: "View all employees",
             value: "viewEmp",
           },
           {
-            name: "view roles",
+            name: "View all employee roles",
             value: "viewRole",
           },
           {
-            name: "view all departments",
+            name: "View all departments",
             value: "viewDep",
+          },
+          {
+            name: "Add a new employee",
+            value: "addEmp",
           },
           {
             name: "Quit",
@@ -58,6 +62,9 @@ function init() {
       } else if (answers.questions === "viewDep") {
         // call view departments function
         viewDepartments();
+      } else if (answers.questions === "addEmp") {
+        // call addEmployee function
+        addEmployee();
       }
     });
 }
@@ -69,6 +76,7 @@ function viewEmployees() {
   console.log("employees");
   db.query(sql, (err, rows) => {
     console.table(rows);
+    init();
   });
 }
 
@@ -79,6 +87,7 @@ function viewRoles() {
   console.log("roles");
   db.query(sql, (err, rows) => {
     console.table(rows);
+    init();
   });
 }
 
@@ -89,15 +98,72 @@ function viewDepartments() {
   console.log("departments");
   db.query(sql, (err, rows) => {
     console.table(rows);
+    init();
   });
 }
 
 // different functions for each user choice - choose your own adventure! (do these last, clear viewAllEmployees first)
 
-// funtion createEmployee
+// function addRole
+
+// function addDepartment
+
+// funtion addEmployee
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "What is the employee's first name?",
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "What is the employee's last name?",
+      },
+    ])
+
+    // promise
+    .then((answers) => {
+      db.query("SELECT * FROM roles", function (err, results) {
+        const roles = results.map(({ id, title }) => ({
+          name: title,
+          value: id,
+        }));
+        inquirer
+          .prompt({
+            type: "list",
+            name: "id",
+            message: "What is the employee's role?",
+            choices: roles,
+          })
+          .then((role) => {
+            db.query("SELECT * FROM employees WHERE manager_id is null", function (err, results) {
+              const managers = results.map(({ id, first_name }) => ({
+                name: first_name,
+                value: id,
+              }));
+              inquirer
+                .prompt({
+                  type: "list",
+                  name: "id",
+                  message: "What is their manager's name?",
+                  choices: managers,
+                })
+                .then((manager) => {
+                  // inserts new employee data into employees table on SQL
+                  db.query("INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.firstName, answers.lastName, role.id, manager.id]);
+                  init();
+                });
+            });
+          });
+      });
+    });
+}
 // inquirer prompt to ask for first, last name
 //.then query roles table
 // inquirer prompt for choosing role
-//.thn ask who manager is
+//.then prompt to ask who manager is
 
 init();

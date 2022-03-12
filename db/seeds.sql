@@ -3,10 +3,10 @@ VALUES ("Animal Care"),
        ("Animal Adoptions");
        
 INSERT INTO roles (title, salary, department_id) 
-VALUES ("Manager", 50000, 1),
-       ("Manager", 50000, 2),
-       ("Technician", 35000, 1),
-       ("Guide", 35000, 2);
+VALUES ("Care Manager", 50000, 1),
+       ("Adoption Manager", 50000, 2),
+       ("Care Technician", 35000, 1),
+       ("Adoption Guide", 35000, 2);
        
 INSERT INTO employees (first_name, last_name, role_id, manager_id) 
 VALUES ("Buddy", "Baker", 1, NULL),
