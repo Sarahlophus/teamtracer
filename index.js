@@ -1,7 +1,7 @@
 // Import and require express, inquirer, mysql2, dotenv
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-
+require("console.table");
 require("dotenv").config();
 
 // Connect to database
@@ -13,7 +13,7 @@ const db = mysql.createConnection(
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   },
-  console.log(`Connected to the employee_db database.`)
+  console.log(`Connected to the teamtracer_db database.`)
 );
 
 // start inquirer
@@ -29,6 +29,10 @@ function init() {
           {
             name: "view all employees",
             value: "viewEmp",
+          },
+          {
+            name: "view roles",
+            value: "viewRole",
           },
           {
             name: "view all departments",
@@ -48,6 +52,9 @@ function init() {
       if (answers.questions === "viewEmp") {
         // call view employees function
         viewEmployees();
+      } else if (answers.questions === "viewRole") {
+        // call view roles function
+        viewRoles();
       } else if (answers.questions === "viewDep") {
         // call view departments function
         viewDepartments();
@@ -55,6 +62,7 @@ function init() {
     });
 }
 
+// view all employees option
 function viewEmployees() {
   // db.query
   const sql = "SELECT * FROM employees";
@@ -64,6 +72,17 @@ function viewEmployees() {
   });
 }
 
+// view all roles option
+function viewRoles() {
+  // db.query
+  const sql = "SELECT * FROM roles";
+  console.log("roles");
+  db.query(sql, (err, rows) => {
+    console.table(rows);
+  });
+}
+
+// view departments option
 function viewDepartments() {
   // db.query
   const sql = "SELECT * FROM departments";
@@ -71,8 +90,6 @@ function viewDepartments() {
   db.query(sql, (err, rows) => {
     console.table(rows);
   });
-  //select * from employees (cream filling!)
-  // console.table of cream filling (yum!)
 }
 
 // different functions for each user choice - choose your own adventure! (do these last, clear viewAllEmployees first)
