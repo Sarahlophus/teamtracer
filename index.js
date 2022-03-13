@@ -79,9 +79,12 @@ function init() {
       } else if (answers.questions === "addDept") {
         // call addDept function
         addDept();
+      } else {
+        quit();
       }
     });
 }
+// different functions for each user choice - choose your own adventure:
 
 // view all employees option
 function viewEmployees() {
@@ -115,8 +118,6 @@ function viewDepartments() {
     init();
   });
 }
-
-// different functions for each user choice - choose your own adventure!
 
 // funtion to add new employee to teamtracer_db(employees table)
 function addEmployee() {
@@ -152,26 +153,38 @@ function addEmployee() {
           })
           // promise to resolve assigning employee to manager
           .then((role) => {
-            db.query("SELECT * FROM employees WHERE manager_id is null", function (err, results) {
-              const managers = results.map(({ id, first_name }) => ({
-                name: first_name,
-                value: id,
-              }));
-              // inquirer prompt to ask who manager is
-              inquirer
-                .prompt({
-                  type: "list",
-                  name: "id",
-                  message: "What is their manager's name?",
-                  choices: managers,
-                })
-                // promise to insert new employee's info into employee table
-                .then((manager) => {
-                  // inserts new employee data into employees table on SQL
-                  db.query("INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.firstName, answers.lastName, role.id, manager.id]);
-                  console.log(`${answers.firstName} ${answers.lastName} has been added to your Employee List!`);
-                  init();
+            db.query("SELECT title FROM roles WHERE id = ?", role.id, function (err, results) {
+              const roleTitle = results[0].title;
+              // conditional: if new employee is a manager, add them to db with a manager ID of 'null'
+              if (roleTitle.includes("Manager")) {
+                // inserts new employee data into employees table on SQL
+                db.query("INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.firstName, answers.lastName, role.id, null]);
+                console.log(`${answers.firstName} ${answers.lastName} has been added to your Employee List!`);
+                init();
+              } else {
+                // conditional: if new employee is not a manager, assign them to current list of managers
+                db.query("SELECT * FROM employees WHERE manager_id is null", function (err, results) {
+                  const managers = results.map(({ id, first_name }) => ({
+                    name: first_name,
+                    value: id,
+                  }));
+                  // inquirer prompt to ask who manager is
+                  inquirer
+                    .prompt({
+                      type: "list",
+                      name: "id",
+                      message: "What is their manager's name?",
+                      choices: managers,
+                    })
+                    // promise to insert new employee's info into employee table
+                    .then((manager) => {
+                      // inserts new employee data into employees table on SQL
+                      db.query("INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.firstName, answers.lastName, role.id, manager.id]);
+                      console.log(`${answers.firstName} ${answers.lastName} has been added to your Employee List!`);
+                      init();
+                    });
                 });
+              }
             });
           });
       });
@@ -240,6 +253,11 @@ function addDept() {
       console.log(`${answers.deptName} has been added to your Departments!`);
       init();
     });
+}
+
+// function to quit Inquirer
+function quit() {
+  process.exit();
 }
 
 // start Inquirer program
