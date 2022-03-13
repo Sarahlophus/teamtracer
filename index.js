@@ -84,8 +84,8 @@ function init() {
       }
     });
 }
-// different functions for each user choice - choose your own adventure:
 
+// different functions for each user choice - choose your own adventure:
 // view all employees option
 function viewEmployees() {
   // db.query
