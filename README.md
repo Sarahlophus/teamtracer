@@ -17,7 +17,7 @@ This node.js program uses the NPM packages Inquirer, Console.Table, dotENV, and 
 ### Includes:
 
 - User can navigate through the TeamTracer database to view departments, roles, and employees
-- User can keep view employees' name, manager, salary, and more
+- User can view employees' name, manager, salary, and more
 - User can add new departments, roles, or employees to their database
 - User can change employees' roles
 - User can complete tasks until they 'Quit' out of the program
