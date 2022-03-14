@@ -16,6 +16,9 @@ const db = mysql.createConnection(
   console.log(`Connected to the teamtracer_db database.`)
 );
 
+// display TeamTracer banner
+banner();
+
 // start inquirer
 function init() {
   inquirer
@@ -45,6 +48,10 @@ function init() {
           {
             name: "Add a new job role",
             value: "addRole",
+          },
+          {
+            name: "Update a current employee's role",
+            value: "updateRole",
           },
           {
             name: "Add a new department",
@@ -79,6 +86,9 @@ function init() {
       } else if (answers.questions === "addDept") {
         // call addDept function
         addDept();
+      } else if (answers.questions === "updateRole") {
+        // call updateEmpRole
+        updateEmpRole();
       } else {
         quit();
       }
@@ -234,6 +244,43 @@ function addRole() {
     });
 }
 
+function updateEmpRole() {
+  db.query(`SELECT * FROM employees`, (err, results) => {
+    const employees = results.map(({ id, first_name }) => ({
+      name: first_name,
+      value: id,
+    }));
+    inquirer
+      .prompt({
+        name: "empChange",
+        message: "Which employee's role are you updating?",
+        type: "list",
+        choices: employees,
+      })
+      .then((employee) => {
+        console.log(employee.empChange);
+        db.query("SELECT * FROM roles", function (err, results) {
+          const roles = results.map(({ id, title }) => ({
+            name: title,
+            value: id,
+          }));
+          inquirer
+            .prompt({
+              name: "newRole",
+              message: "What is this employee's new job role?",
+              type: "list",
+              choices: roles,
+            })
+            .then((role) => {
+              db.query("UPDATE employees SET role_id = ? WHERE id = ?", [role.id, employee.id]);
+              console.log("You have successfully updated your employee's role!");
+              init();
+            });
+        });
+      });
+  });
+}
+
 // function addDepartment
 function addDept() {
   // inquirer promp to ask for new department's name,
@@ -258,6 +305,21 @@ function addDept() {
 // function to quit Inquirer
 function quit() {
   process.exit();
+}
+
+function banner() {
+  console.log(`
+  ███████████                                    ███████████                                                
+  ░█░░░███░░░█                                   ░█░░░███░░░█                                                
+  ░   ░███  ░   ██████   ██████   █████████████  ░   ░███  ░  ████████   ██████    ██████   ██████  ████████ 
+      ░███     ███░░███ ░░░░░███ ░░███░░███░░███     ░███    ░░███░░███ ░░░░░███  ███░░███ ███░░███░░███░░███
+      ░███    ░███████   ███████  ░███ ░███ ░███     ░███     ░███ ░░░   ███████ ░███ ░░░ ░███████  ░███ ░░░ 
+      ░███    ░███░░░   ███░░███  ░███ ░███ ░███     ░███     ░███      ███░░███ ░███  ███░███░░░   ░███     
+      █████   ░░██████ ░░████████ █████░███ █████    █████    █████    ░░████████░░██████ ░░██████  █████    
+     ░░░░░     ░░░░░░   ░░░░░░░░ ░░░░░ ░░░ ░░░░░    ░░░░░    ░░░░░      ░░░░░░░░  ░░░░░░   ░░░░░░  ░░░░░     
+                                                                                                             
+                                                                                                             
+                                                                                                             `);
 }
 
 // start Inquirer program

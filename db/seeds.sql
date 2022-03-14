@@ -4,7 +4,7 @@ VALUES ("Animal Care"),
        
 INSERT INTO roles (title, salary, department_id) 
 VALUES ("Care Manager", 60000, 1),
-		("Care Technician", 40000, 1),
+	("Care Technician", 40000, 1),
        ("Adoption Manager", 60000, 2),
        ("Adoption Guide", 40000, 2);
        
