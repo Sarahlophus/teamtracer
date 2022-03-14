@@ -30,32 +30,32 @@ function init() {
         message: "What would you like to do?",
         choices: [
           {
-            name: "View all employees",
-            value: "viewEmp",
+            name: "View all departments",
+            value: "viewDep",
+          },
+          {
+            name: "Add a new department",
+            value: "addDept",
           },
           {
             name: "View all employee roles",
             value: "viewRole",
           },
           {
-            name: "View all departments",
-            value: "viewDep",
+            name: "Add a new job role",
+            value: "addRole",
+          },
+          {
+            name: "View all employees",
+            value: "viewEmp",
           },
           {
             name: "Add a new employee",
             value: "addEmp",
           },
           {
-            name: "Add a new job role",
-            value: "addRole",
-          },
-          {
             name: "Update a current employee's role",
             value: "updateRole",
-          },
-          {
-            name: "Add a new department",
-            value: "addDept",
           },
           {
             name: "Quit",
