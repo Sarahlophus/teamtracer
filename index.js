@@ -96,15 +96,36 @@ function init() {
 }
 
 // different functions for each user choice - choose your own adventure:
-// view all employees option
-function viewEmployees() {
+// view departments option
+function viewDepartments() {
   // db.query
-  const sql = "SELECT * FROM employees";
-  console.log("employees");
+  const sql = "SELECT * FROM departments";
+  console.log("departments");
   db.query(sql, (err, rows) => {
     console.table(rows);
     init();
   });
+}
+
+// function addDepartment
+function addDept() {
+  // inquirer promp to ask for new department's name,
+  inquirer
+    .prompt([
+      {
+        name: "deptName",
+        type: "input",
+        message: "Enter the name of this new department",
+      },
+    ])
+
+    // promise to insert new department info into department table
+    .then((answers) => {
+      // inserts new department data into roles table on SQL
+      db.query("INSERT INTO departments (dept_name) VALUES (?)", [answers.deptName]);
+      console.log(`${answers.deptName} has been added to your Departments!`);
+      init();
+    });
 }
 
 // view all roles option
@@ -118,11 +139,54 @@ function viewRoles() {
   });
 }
 
-// view departments option
-function viewDepartments() {
+// function to add new role to teamtracer_db(roles table)
+function addRole() {
+  // inquirer promp to as for new role's title, salary,
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "Enter the job title of this new role",
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Enter the salary of this new role",
+      },
+    ])
+
+    // promise to resolve linking to departments table
+    .then((answers) => {
+      db.query("SELECT * FROM departments", function (err, results) {
+        const depts = results.map(({ id, dept_name }) => ({
+          name: dept_name,
+          value: id,
+        }));
+        // inquirer prompt to ask for new role's department
+        inquirer
+          .prompt({
+            type: "list",
+            name: "id",
+            message: "Select the department for this new role",
+            choices: depts,
+          })
+          // promise to insert new role info into roles table
+          .then((department) => {
+            // inserts new role data into roles table on SQL
+            db.query("INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)", [answers.title, answers.salary, department.id]);
+            console.log(`${answers.title} has been added to your Job Roles!`);
+            init();
+          });
+      });
+    });
+}
+
+// view all employees option
+function viewEmployees() {
   // db.query
-  const sql = "SELECT * FROM departments";
-  console.log("departments");
+  const sql = "SELECT * FROM employees";
+  console.log("employees");
   db.query(sql, (err, rows) => {
     console.table(rows);
     init();
@@ -201,49 +265,6 @@ function addEmployee() {
     });
 }
 
-// function to add new role to teamtracer_db(roles table)
-function addRole() {
-  // inquirer promp to as for new role's title, salary,
-  inquirer
-    .prompt([
-      {
-        name: "title",
-        type: "input",
-        message: "Enter the job title of this new role",
-      },
-      {
-        name: "salary",
-        type: "input",
-        message: "Enter the salary of this new role",
-      },
-    ])
-
-    // promise to resolve linking to departments table
-    .then((answers) => {
-      db.query("SELECT * FROM departments", function (err, results) {
-        const depts = results.map(({ id, dept_name }) => ({
-          name: dept_name,
-          value: id,
-        }));
-        // inquirer prompt to ask for new role's department
-        inquirer
-          .prompt({
-            type: "list",
-            name: "id",
-            message: "Select the department for this new role",
-            choices: depts,
-          })
-          // promise to insert new role info into roles table
-          .then((department) => {
-            // inserts new role data into roles table on SQL
-            db.query("INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)", [answers.title, answers.salary, department.id]);
-            console.log(`${answers.title} has been added to your Job Roles!`);
-            init();
-          });
-      });
-    });
-}
-
 function updateEmpRole() {
   db.query(`SELECT * FROM employees`, (err, results) => {
     const employees = results.map(({ id, first_name }) => ({
@@ -279,27 +300,6 @@ function updateEmpRole() {
         });
       });
   });
-}
-
-// function addDepartment
-function addDept() {
-  // inquirer promp to ask for new department's name,
-  inquirer
-    .prompt([
-      {
-        name: "deptName",
-        type: "input",
-        message: "Enter the name of this new department",
-      },
-    ])
-
-    // promise to insert new department info into department table
-    .then((answers) => {
-      // inserts new department data into roles table on SQL
-      db.query("INSERT INTO departments (dept_name) VALUES (?)", [answers.deptName]);
-      console.log(`${answers.deptName} has been added to your Departments!`);
-      init();
-    });
 }
 
 // function to quit Inquirer
