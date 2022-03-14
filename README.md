@@ -31,4 +31,4 @@ To start this program, open the terminal and enter <code>node index</code>. Answ
 ## Links
 
 - Repository: https://github.com/Sarahlophus/teamtracer
-- Walkthrough video:
+- Walkthrough video: https://drive.google.com/file/d/1cCy8keWl0kzuZ2CVFPXjFrAsVyN2bzTi/view?usp=sharing
