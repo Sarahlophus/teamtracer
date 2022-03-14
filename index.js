@@ -238,8 +238,8 @@ function addEmployee() {
               } else {
                 // conditional: if new employee is not a manager, assign them to current list of managers
                 db.query("SELECT * FROM employees WHERE manager_id is null", function (err, results) {
-                  const managers = results.map(({ id, first_name }) => ({
-                    name: first_name,
+                  const managers = results.map(({ id, first_name, last_name }) => ({
+                    name: `${first_name} ${last_name}`,
                     value: id,
                   }));
                   // inquirer prompt to ask who manager is
@@ -265,10 +265,12 @@ function addEmployee() {
     });
 }
 
+// function to update employee role in teamtracer_db
 function updateEmpRole() {
+  // references all data from employees table
   db.query(`SELECT * FROM employees`, (err, results) => {
-    const employees = results.map(({ id, first_name }) => ({
-      name: first_name,
+    const employees = results.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name}`,
       value: id,
     }));
     inquirer
@@ -279,7 +281,7 @@ function updateEmpRole() {
         choices: employees,
       })
       .then((employee) => {
-        console.log(employee.empChange);
+        // references all data from roles table
         db.query("SELECT * FROM roles", function (err, results) {
           const roles = results.map(({ id, title }) => ({
             name: title,
@@ -292,10 +294,42 @@ function updateEmpRole() {
               type: "list",
               choices: roles,
             })
+            // conditional: if manager vs if not manager
             .then((role) => {
-              db.query("UPDATE employees SET role_id = ? WHERE id = ?", [role.id, employee.id]);
-              console.log("You have successfully updated your employee's role!");
-              init();
+              // references job title from roles table, where the ID equals user's input
+              db.query("SELECT title FROM roles WHERE id = ?", role.newRole, function (err, results) {
+                const newEmpRole = results[0].title;
+                // conditional: if updated employee is now a manager, add them to db with a manager ID of 'null'
+                if (newEmpRole.includes("Manager")) {
+                  // updates data in employees table on SQL
+                  db.query("UPDATE employees SET role_id = ?, manager_id = ? WHERE id = ?", [role.newRole, null, employee.empChange]);
+                  console.log("Your employee has been successfully updated!");
+                  init();
+                } else {
+                  // conditional: if updated employee is moving to a non-manager position, as for their new manager
+                  db.query("SELECT * FROM employees WHERE manager_id is null", function (err, results) {
+                    const newManagers = results.map(({ id, first_name, last_name }) => ({
+                      name: `${first_name} ${last_name}`,
+                      value: id,
+                    }));
+                    // inquirer prompt to ask who manager is
+                    inquirer
+                      .prompt({
+                        type: "list",
+                        name: "id",
+                        message: "What is their new manager's name?",
+                        choices: newManagers,
+                      })
+                      // promise to insert new employee's info into employee table
+                      .then((manager) => {
+                        // inserts new employee data into employees table on SQL
+                        db.query("UPDATE employees SET role_id = ?, manager_id = ? WHERE id = ?", [role.newRole, manager.id, employee.empChange]);
+                        console.log("Your employee has been successfully updated!");
+                        init();
+                      });
+                  });
+                }
+              });
             });
         });
       });
